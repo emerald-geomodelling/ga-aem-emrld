@@ -1,9 +1,9 @@
 #File patterns that are ignored
 
 # Ignore raijin.nci.org.au specific files
-*raijin*
-!run_make_raijin.sh
-!run_install_raijin.sh
+*gadi*
+!run_make_gadi.sh
+!run_install_gadi.sh
 
 # Ignore output files from the examples
 examples/**/output
@@ -13,12 +13,12 @@ examples/**/*.log
 # Ignore output from julia synthetic tests
 julia/output
 
-# Ignore all binary executables
-*.exe
-*.dll
-*.mexw64
-/bin/x64/Release/*.exp
-/bin/x64/Release/*.lib
+# Ignore debug binary executables
+#*.exe
+#*.dll
+#*.mexw64
+#/bin/x64/Release/*.exp
+#/bin/x64/Release/*.lib
 /bin/x64/Debug
 /bin/x64/Debug/*.exe
 /bin/x64/Debug/*.exp
