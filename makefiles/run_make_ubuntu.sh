@@ -51,11 +51,12 @@ echo ---------------------------------------
 #make -f ctlinedata2sgrid.make $makemode
 #make -f ctlinedata2slicegrids.make $makemode
 #make -f example_forward_model.make $makemode
-#make -f gaforwardmodeltdem.make $makemode
+make -f gaforwardmodeltdem.make $makemode
+make -f galeisbstdem.make $makemode
 
 #Compile with MPI
 #make -f galeisbstdem.make $makemode
-make -f garjmcmctdem.make $makemode
+#make -f garjmcmctdem.make $makemode
 #make -f galeiallatonce.make $makemode
 #make -f galeisbsfdem.make $makemode
 
