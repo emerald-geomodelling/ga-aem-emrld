@@ -15,3 +15,5 @@ RUN apt install -y libnetcdf-c++4-1 libnetcdf-c++4-dev
 RUN apt install -y mc
 ADD . /ga-aem
 RUN cd /ga-aem/makefiles; ./run_make_ubuntu.sh gnu allclean 
+WORKDIR /ga-aem/
+ENV PATH="$PATH:/ga-aem/bin/gnu"
