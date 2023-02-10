@@ -8,6 +8,7 @@ Git submodules are used in this project. They contain utility and third party so
 >> git submodule init 
 >> git submodule update 
 >> git submodule status 
+>> git submodule update --init --recursive
 ```
 
 # cpp-utils
