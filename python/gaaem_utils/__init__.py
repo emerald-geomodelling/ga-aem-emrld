@@ -2,6 +2,7 @@ import numpy as np;
 import pandas as pd
 import sys
 import matplotlib.pyplot as plt
+import copy, os
 
 
 def calc_lineOffset(data):
@@ -26,7 +27,10 @@ def make_XYZ_model(xyz):
     xyz["layer_data"]["dep_bot"]=xyz["layer_data"]['thickness'].cumsum(axis=1)
     xyz["layer_data"]["dep_top"]=xyz["layer_data"]["dep_bot"]-xyz["layer_data"]['thickness']
     xyz["flightlines"]["alt"]=xyz["flightlines"].tx_height  
-    xyz["flightlines"]["invalt"]=xyz["flightlines"].tx_height+xyz["flightlines"].txrx_dz
+    if "inverted_tx_height" in xyz["flightlines"].columns:
+        xyz["flightlines"]["invalt"]=xyz["flightlines"].inverted_tx_height
+    else:
+        xyz["flightlines"]["invalt"]=xyz["flightlines"].tx_height * np.nan
 
 
 def plot_model_section(model, ax, keyx="utmy", res_key='rho_i', elev_key='elevation', doi_key='doi_standard', 
@@ -143,3 +147,92 @@ def read_GAAEM_data(data_fullfile):
          }
         
     return data
+
+
+def get_GALEI_files(data_dir, data_prefix="inversion.output", data_suffix=".asc"):
+    file_list=[]
+    for root, dirs, files in os.walk(data_dir):
+            for file in files:
+                if file.endswith(data_suffix) and file.startswith(data_prefix):
+                    file_list.append(os.path.join(root, file))
+    if len(file_list)==0:
+        raise Exception("No inversion files found in this folder")
+    return file_list
+
+def read_GALEI_files(data_dir, data_prefix="inversion.output", data_suffix=".asc"):
+    file_list = get_GALEI_files(data_dir, data_prefix="inversion.output", data_suffix=".asc")
+    print("Reading files:{}".format(file_list))
+    alldata={}
+    for file in file_list:
+        data=read_GAAEM_data(file)
+        if len(alldata.keys())==0:
+            alldata=data
+        else:
+            alldata["flightlines"]=pd.concat([alldata["flightlines"], data["flightlines"]], axis=0)
+            for key in data["layer_data"].keys():
+                if key in alldata["layer_data"].keys():
+                    alldata["layer_data"][key] = pd.concat([alldata["layer_data"][key], data["layer_data"][key]], axis=0)
+                else:
+                    print("something is wrong")
+                    print("cannot find key: {0} in file: {1}".format(key,file))
+    df=copy.deepcopy(alldata["flightlines"]) 
+    layer_data_columns={}
+    for key in alldata["layer_data"].keys():
+        df=pd.concat([df, alldata["layer_data"][key]], axis=1)
+        layer_data_columns[key]=alldata["layer_data"][key].columns
+
+    df.sort_values("uniqueid", inplace=True)
+    df.reset_index(inplace=True, drop=True)
+
+    layer_data={}
+    for key in layer_data_columns.keys():
+        layer_data[key]=pd.concat([df.pop(x) for x in layer_data_columns[key]], axis=1)
+        #clear_column_name(layer_data[key])
+
+    data_out={"flightlines":df,
+          "layer_data":layer_data
+         }
+    return data_out
+    
+def GALEI_invQCplot(model, figsize=(8,11), keyx="lineoffset"):
+    if (keyx =="lineoffset") and not("lineoffset" in model["flightlines"].columns):
+        calc_lineOffset(model)
+    elif  not(keyx in model["flightlines"].columns):
+        raise Exception("keyx not found in model['flightlines']")
+    fig, ax = plt.subplots(4,1,figsize=figsize, sharex=True)
+    ax[0].plot(model["flightlines"][keyx], 
+              model["layer_data"]["observed_EMSystem_1_ZS"].abs(),
+              ".", ms=2,
+              label="observed_EMSystem_1_ZS")
+    ax[0].set_prop_cycle(None)
+    ax[0].plot(model["flightlines"][keyx], 
+              model["layer_data"]["predicted_EMSystem_1_ZS"].abs(),
+              "-", lw=1,
+              label="predicted_EMSystem_1_ZS")
+    ax[0].set_yscale("log")
+    ax[0].set_title("data LM")
+
+    ax[1].plot(model["flightlines"][keyx], 
+              model["layer_data"]["observed_EMSystem_2_ZS"].abs(),
+               ".", ms=2,
+              label="observed_EMSystem_2_ZS")
+    ax[1].set_prop_cycle(None)
+    ax[1].plot(model["flightlines"][keyx], 
+              model["layer_data"]["predicted_EMSystem_2_ZS"].abs(),
+               "-", lw=1,
+              label="predicted_EMSystem_2_ZS")
+    ax[1].set_yscale("log")
+    ax[1].set_title("data HM")
+
+    plot_model_section(model, ax=ax[2], keyx=keyx, hideBelowDOI=False, cb_orientation="horizontal", clim=[0, 3.5])
+    ax[1].set_title("inverted model")
+
+    for phi  in ["PhiM", "PhiD", "PhiC", "PhiT", "PhiG", "PhiS"]:
+        ax[3].plot(model["flightlines"][keyx], model["flightlines"][phi], label=phi)
+    ax[3].set_yscale("log")
+    ax[3].set_xlabel(keyx)
+    ax[3].grid()
+    ax[3].legend()
+
+    plt.tight_layout()
+    return fig, ax
