@@ -11,3 +11,5 @@ RUN apt install -y libfftw3-dev libfftw3-double3 libfftw3-mpi-dev libfftw3-mpi3
 RUN apt install -y build-essential
 RUN apt install -y environment-modules
 RUN apt install -y libnetcdf-dev libnetcdf-mpi-dev libnetcdf15 libnetcdf-mpi-13
+RUN apt install -y libnetcdf-c++4-1 libnetcdf-c++4-dev
+RUN apt apt install mc
