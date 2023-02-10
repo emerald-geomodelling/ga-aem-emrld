@@ -32,7 +32,7 @@ fi
 
 export mpicxx=mpiCC
 export HAVE_NETCDF=1
-export HAVE_GDAL=1
+export HAVE_GDAL=0
 
 if [ $HAVE_NETCDF = 1 ] ; then
 	echo 'Building with NETCDF'
