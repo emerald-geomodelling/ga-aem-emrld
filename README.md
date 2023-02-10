@@ -51,6 +51,13 @@
 - Open ga-aem\vs2013\ga-aem-all\ga-aem-all.sln to compile all programs plus the matlab and python shared libraries.
 - Alternatively open individual program solutions files in their respective directories.
 
+## Building using Docker:
+- You can run the programs in a Docker container on all platforms using Docker
+- Use the *Dockerfile* to 
+   - bulid a Ubuntu based Docker image with all the required dependencies installed
+   - automatically compile the code inside the Docker container
+
+
 ## Additional source code and library dependencies
 
 The programs required additional code or libraries as described below.
