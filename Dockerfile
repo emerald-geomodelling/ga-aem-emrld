@@ -14,7 +14,8 @@ RUN apt install -y environment-modules
 RUN apt install -y libnetcdf-dev libnetcdf-mpi-dev libnetcdf15 libnetcdf-mpi-13
 RUN apt install -y libnetcdf-c++4-1 libnetcdf-c++4-dev
 RUN apt install -y gdal-bin libgdal-dev pktools-dev
-RUN apt install -y mc
+RUN apt install -y mc 
+RUN apt install -y dos2unix
 ADD . /ga-aem
 RUN cd /ga-aem/makefiles; ./run_make_ubuntu.sh gnu allclean 
 WORKDIR /ga-aem/

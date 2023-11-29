@@ -58,7 +58,7 @@ Control Begin
 	Options End
 
 	Input Begin
-		DataFile   = ..\data\bhmar-skytem.dat
+		DataFile   = ..\data\bhmar-skytem_subset.dat
 		HeaderLines = 0
 		Subsample   = 1
 
